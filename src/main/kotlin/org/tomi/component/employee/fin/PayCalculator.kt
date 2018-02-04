@@ -5,6 +5,6 @@ import org.tomi.domain.Employee
 class PayCalculator {
 
   fun calculatePay(employee: Employee, days: Int): Double {
-    return employee.hoursPerDay * employee.salaryPerDay * days;
+    return employee.hoursPerDay * employee.salaryPerDay * days
   }
 }

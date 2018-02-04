@@ -1,6 +1,6 @@
 package org.tomi.application
 
-import org.tomi.component.employee.fin.EmployeeFinImpl
+import org.koin.standalone.StandAloneContext
 import org.tomi.domain.Department
 import org.tomi.domain.Employee
 import spark.Spark.get
@@ -9,13 +9,15 @@ import spark.Spark.post
 import java.time.Month
 import java.util.UUID
 
-private val employeeFinImpl = EmployeeFinImpl();
-
 private val employee = Employee(8, "Sir Lancelot")
 
 fun main(args: Array<String>) {
 
+  StandAloneContext.startKoin(listOf(EmployeeFinancialComponent.getFinModule()))
+
   val log = org.slf4j.LoggerFactory.getLogger("main class")
+
+  val financialComponent = EmployeeFinancialComponent()
 
   employee.department = Department("Management")
   employee.type = Employee.EmployeeType.SENIOR
@@ -24,23 +26,24 @@ fun main(args: Array<String>) {
   path("/employees") {
 
     get("/hours/:month") { request, response ->
-      employeeFinImpl.reportHours(employee, Month.of(request.params("month").toInt()))
-
+      response.status(200)
+      financialComponent.reportHours(employee, Month.of(request.params("month").toInt()))
     }
 
     get("/calculate/:days") { request, response ->
-      employeeFinImpl.calculatePay(employee, request.params("days").toInt()) // number of days worked in the month
+      financialComponent.calculatePay(employee, request.params("days").toInt()) // number of days worked in the month
     }
 
     post("/save") { request, response ->
 
       log.info("Saving employee...")
       employee.id = UUID.randomUUID().toString()
-      employeeFinImpl.save(employee)
+      financialComponent.save(employee)
 
       response.status(201)
       response.type("application/json")
-      employee.toJson()
+      employee::toJson
     }
   }
 }
+

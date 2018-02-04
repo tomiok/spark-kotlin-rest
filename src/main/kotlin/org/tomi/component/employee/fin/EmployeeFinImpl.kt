@@ -2,17 +2,15 @@ package org.tomi.component.employee.fin
 
 import org.tomi.domain.Employee
 import java.time.Month
+import javax.ejb.Singleton
 
-class EmployeeFinImpl : EmployeeFin {
-
-  private val payCalculator = PayCalculator()
-
-  private val hourReporter = HourReporter()
-
-  private val employeeRepo = EmployeeRepository()
+@Singleton
+class EmployeeFinImpl(private var payCalc: PayCalculator,
+  private var hourReporter: HourReporter,
+  private var employeeRepo: EmployeeRepository) : EmployeeFin {
 
   override fun calculatePay(employee: Employee, days: Int): Double {
-    return payCalculator.calculatePay(employee, days)
+    return payCalc.calculatePay(employee, days)
   }
 
   override fun reportHours(employee: Employee, month: Month): Int {
